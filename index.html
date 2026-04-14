@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Student Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #161a22;
+    --surface2: #1e2330;
+    --border: #2a3040;
+    --accent: #4ade80;
+    --accent2: #22d3ee;
+    --danger: #f87171;
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --card-hover: #232a38;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(74,222,128,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(74,222,128,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    animation: slideDown 0.5s ease;
+  }
+
+  .logo-area h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.5px;
+  }
+
+  .logo-area p {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-top: 2px;
+  }
+
+  .stats-pill {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 6px 16px;
+    font-size: 0.8rem;
+    color: var(--accent);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .stats-pill span { color: var(--muted); }
+
+  /* Form Card */
+  .form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 28px;
+    animation: slideDown 0.5s ease 0.1s both;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .form-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px 2px 0 0;
+  }
+
+  .form-card h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 12px;
+    align-items: end;
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .input-group label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+  }
+
+  input[type="text"] {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.2s;
+    width: 100%;
+  }
+
+  input[type="text"]:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(74,222,128,0.1);
+  }
+
+  input[type="text"]::placeholder { color: var(--muted); }
+
+  .btn-add {
+    background: linear-gradient(135deg, var(--accent), #16a34a);
+    border: none;
+    border-radius: 10px;
+    padding: 12px 24px;
+    color: #0d0f14;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-add:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(74,222,128,0.3);
+  }
+
+  .btn-add:active { transform: translateY(0); }
+
+  /* Search + Filter Bar */
+  .toolbar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    animation: slideDown 0.5s ease 0.2s both;
+  }
+
+  .search-wrap {
+    position: relative;
+    flex: 1;
+  }
+
+  .search-wrap svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+  }
+
+  #searchInput {
+    padding-left: 40px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+
+  .sort-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .sort-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Student List */
+  .list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+
+  .list-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .btn-logout {
+    background: transparent;
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .btn-logout:hover { background: rgba(248,113,113,0.1); }
+
+  #studentList {
+    display: grid;
+    gap: 10px;
+    animation: slideDown 0.5s ease 0.3s both;
+  }
+
+  .student-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.2s;
+    animation: cardIn 0.3s ease both;
+  }
+
+  .student-card:hover {
+    background: var(--card-hover);
+    border-color: rgba(74,222,128,0.3);
+    transform: translateX(4px);
+  }
+
+  .avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .card-info { flex: 1; min-width: 0; }
+
+  .card-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card-course {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  .card-id {
+    font-size: 0.7rem;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    opacity: 0.6;
+  }
+
+  .course-badge {
+    background: rgba(34,211,238,0.1);
+    border: 1px solid rgba(34,211,238,0.2);
+    color: var(--accent2);
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  .btn-delete {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--muted);
+    border-radius: 8px;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .btn-delete:hover { border-color: var(--danger); color: var(--danger); background: rgba(248,113,113,0.08); }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+    animation: fadeIn 0.4s ease;
+  }
+
+  .empty-state svg { margin-bottom: 14px; opacity: 0.3; }
+  .empty-state p { font-size: 0.9rem; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: var(--surface2);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 14px 20px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+    z-index: 1000;
+    animation: toastIn 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  }
+
+  /* Animations */
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateX(-12px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 600px) {
+    .form-row { grid-template-columns: 1fr; }
+    .course-badge { display: none; }
+    header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- Header -->
+  <header>
+    <div class="logo-area">
+      <h1>Student Manager</h1>
+      <p>Track & manage your students</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="stats-pill">
+        <span>Total:</span>
+        <strong id="totalCount">0</strong>
+      </div>
+      <button class="btn-logout" onclick="logout()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </button>
+    </div>
+  </header>
+
+  <!-- Add Form -->
+  <div class="form-card">
+    <h2>Add Student</h2>
+    <div class="form-row">
+      <div class="input-group">
+        <label>Full Name</label>
+        <input type="text" id="nameInput" placeholder="e.g. Adil Khan"/>
+      </div>
+      <div class="input-group">
+        <label>Course</label>
+        <input type="text" id="courseInput" placeholder="e.g. Computer Science"/>
+      </div>
+      <button class="btn-add" onclick="addStudent()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add
+      </button>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="searchInput" placeholder="Search by name or course..." oninput="renderList()"/>
+    </div>
+    <button class="sort-btn" onclick="toggleSort()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
+      Sort A–Z
+    </button>
+  </div>
+
+  <!-- List -->
+  <div class="list-header">
+    <h2>Students</h2>
+  </div>
+  <div id="studentList"></div>
+</div>
+
+<script>
+  const COLORS = [
+    ['#4ade80','#052e16'],['#22d3ee','#0a1f2a'],['#f472b6','#2d0a1a'],
+    ['#fb923c','#2d1200'],['#a78bfa','#1a0a2d'],['#facc15','#2d2200']
+  ];
+
+  let students = JSON.parse(localStorage.getItem('students') || '[]');
+  let sortAZ = false;
+  let idCounter = parseInt(localStorage.getItem('idCounter') || '1');
+
+  function save() {
+    localStorage.setItem('students', JSON.stringify(students));
+    localStorage.setItem('idCounter', idCounter);
+  }
+
+  function getColor(name) {
+    const idx = name.charCodeAt(0) % COLORS.length;
+    return COLORS[idx];
+  }
+
+  function addStudent() {
+    const name = document.getElementById('nameInput').value.trim();
+    const course = document.getElementById('courseInput').value.trim();
+    if (!name || !course) { showToast('⚠️ Please fill both fields'); return; }
+
+    students.push({ id: idCounter++, name, course, date: new Date().toLocaleDateString() });
+    save();
+    document.getElementById('nameInput').value = '';
+    document.getElementById('courseInput').value = '';
+    renderList();
+    showToast('✓ Student added');
+  }
+
+  function deleteStudent(id) {
+    students = students.filter(s => s.id !== id);
+    save();
+    renderList();
+    showToast('Student removed');
+  }
+
+  function toggleSort() {
+    sortAZ = !sortAZ;
+    document.querySelector('.sort-btn').textContent = sortAZ ? '⬆ Sort A–Z' : '⬇ Sort Z–A';
+    renderList();
+  }
+
+  function renderList() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    let list = students.filter(s =>
+      s.name.toLowerCase().includes(q) || s.course.toLowerCase().includes(q)
+    );
+    if (sortAZ) list = [...list].sort((a,b) => a.name.localeCompare(b.name));
+
+    document.getElementById('totalCount').textContent = students.length;
+    const container = document.getElementById('studentList');
+
+    if (!list.length) {
+      container.innerHTML = `<div class="empty-state">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <p>${q ? 'No students match your search' : 'No students yet. Add one above!'}</p>
+      </div>`;
+      return;
+    }
+
+    container.innerHTML = list.map((s, i) => {
+      const [bg, fg] = getColor(s.name);
+      const initials = s.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      return `<div class="student-card" style="animation-delay:${i*0.05}s">
+        <div class="avatar" style="background:${bg}22;color:${bg};border:1px solid ${bg}44">${initials}</div>
+        <div class="card-info">
+          <div class="card-name">${s.name}</div>
+          <div class="card-course">Added ${s.date}</div>
+        </div>
+        <div class="course-badge">${s.course}</div>
+        <button class="btn-delete" onclick="deleteStudent(${s.id})" title="Remove">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </button>
+      </div>`;
+    }).join('');
+  }
+
+  function showToast(msg) {
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2500);
+  }
+
+  function logout() {
+    if (confirm('Logout karna chahte hain?')) {
+      showToast('👋 Logged out');
+    }
+  }
+
+  // Enter key support
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') addStudent();
+  });
+
+  renderList();
+</script>
+</body>
+</html>
